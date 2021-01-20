@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Students</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" />
+    <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+</head>
+<body>
+<h2>Students List</h2>
+<form name="userForm">
+    <input type="hidden" name="id" value="0" />
+    <div class="form-group">
+        <label for="name">NAME:</label>
+        <input class="form-control" name="name" />
+    </div>
+    <div class="form-group">
+        <label for="name">PROFESSION:</label>
+        <select class="form-control" name="prof">
+            <option value="FrontEnd" >FrontEnd</option>
+            <option value="BackEnd">BackEnd</option>
+            <option value="Desktop_Application">Desktop_Application</option>
+            <option value="Mobil_Application">Mobil_Application</option>
+
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="name">ADDRESS:</label>
+        <input class="form-control" name="address" />
+    </div>
+    <div class="form-group">
+        <label for="name">TIME GRAPHIK:</label>
+
+        <select class="form-control" name="graphik">
+            <option value="9:00-12:00">9:00-12:00</option>
+            <option value="12:00-15:00">12:00-15:00</option>
+            <option value="15:00-17:00">15:00-17:00</option>
+            <option value="17:00-19:00">17:00-19:00</option>
+            <option value="19:00-21:00">19:00-21:00</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="age">AG:</label>
+        <input class="form-control" name="age" />
+    </div>
+    <div class="panel-body">
+        <button type="submit" class="btn btn-sm btn-primary">SAVE</button>
+        <a id="reset" class="btn btn-sm btn-primary">DELETE</a>
+    </div>
+</form>
+<table class="table table-condensed table-striped table-bordered">
+    <thead><tr><th>Id</th><th>NAME</th><th>AG</th><th>PROFESSION</th><th>TIME GRAPHIK</th><th>ADDRESS</th></tr></thead>
+    <tbody>
+    </tbody>
+</table>
+
+<script>
+        // qashm hanumenq usanoxneri canky
+        function GetUsers() {
+            $.ajax({
+                url: "/api/users",
+                type: "GET",
+                contentType: "application/json",
+                success: function (users) {
+                    var rows = "";
+                    $.each(users, function (index, user) {
+
+                        rows += row(user);
+                    })
+                    $("table tbody").append(rows);
+                 }
+            });
+        }
+        // usanoxy yst id-i
+        function GetUser(id) {
+            $.ajax({
+                url: "/api/users/"+id,
+                type: "GET",
+                contentType: "application/json",
+                success: function (user) {
+                    var form = document.forms["userForm"];
+                    form.elements["id"].value = user._id;
+                    form.elements["name"].value = user.name;
+                    form.elements["age"].value = user.age;
+                    form.elements["prof"].value = user.prof;
+                    form.elements["graphik"].value = user.graphik;
+                    form.elements["address"].value = user.address;
+                }
+            });
+        }
+        // avelacnum enq usanox
+        function CreateUser(userName, userAge, userProf, userGraphik, userAddress) {
+            $.ajax({
+                url: "api/users",
+                contentType: "application/json",
+                method: "POST",
+                data: JSON.stringify({
+                    name: userName,
+                    age: userAge,
+                    prof: userProf,
+                    graphik:userGraphik,
+                    address:userAddress
+                }),
+                success: function (user) {
+                    reset();
+                    $("table tbody").append(row(user));
+                }
+            })
+        }
+        // poxumenq usanoxin
+        function EditUser(userId, userName, userAge, userProf, userAddress, userGraphik) {
+            $.ajax({
+                url: "api/users",
+                contentType: "application/json",
+                method: "PUT",
+                data: JSON.stringify({
+                    id: userId,
+                    name: userName,
+                    age: userAge,
+                    prof: userProf,
+                    address: userAddress,
+                    graphik: userGraphik
+                }),
+                success: function (user) {
+                    reset();
+                    console.log(user);
+                    $("tr[data-rowid='" + user._id + "']").replaceWith(row(user));
+                }
+            })
+        }
+
+        //jnjum
+        function reset() {
+            var form = document.forms["userForm"];
+            form.reset();
+            form.elements["id"].value = 0;
+        }
+
+        // jnjum enq usanoxin
+        function DeleteUser(id) {
+            $.ajax({
+                url: "api/users/"+id,
+                contentType: "application/json",
+                method: "DELETE",
+                success: function (user) {
+                    console.log(user);
+                    $("tr[data-rowid='" + user._id + "']").remove();
+                }
+            })
+        }
+        // bzbzum enq
+        var row = function (user) {
+            return "<tr data-rowid='" + user._id + "'><td>" + user._id + "</td>" +
+                   "<td>" + user.name + "</td> <td>" + user.age + "</td> <td>" + user.prof + "</td> <td>" + user.address + "</td> <td>" + user.graphik + "</td>"  +
+                   "<td><a class='editLink' data-id='" + user._id + "'>EDIT</a> | " +
+                    "<a class='removeLink' data-id='" + user._id + "'>DELETE</a></td></tr>";
+        }
+        // elienq bzbum
+        $("#reset").click(function (e) {
+
+            e.preventDefault();
+            reset();
+        })
+
+        // uxarkum enq tvyalnery
+        $("form").submit(function (e) {
+            e.preventDefault();
+            var id = this.elements["id"].value;
+            var name = this.elements["name"].value;
+            var prof = this.elements["prof"].value;
+            var address = this.elements["address"].value;
+            var graphik = this.elements["graphik"].value;
+            var age = this.elements["age"].value;
+            if (id == 0)
+                CreateUser(name, age, prof, address, graphik);
+            else
+                EditUser(id, name, age, prof, address, graphik);
+        });
+
+        // poxelu hmar
+        $("body").on("click", ".editLink", function () {
+            var id = $(this).data("id");
+            GetUser(id);
+        })
+        // jnjelu hmar
+        $("body").on("click", ".removeLink", function () {
+            var id = $(this).data("id");
+            DeleteUser(id);
+        })
+
+        // datrkelu hamar
+        GetUsers();
+    </script>
+</body>
+</html>
