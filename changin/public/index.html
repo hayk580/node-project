@@ -56,7 +56,7 @@
 </table>
 
 <script>
-        // qashm hanumenq usanoxneri canky
+        // select Students List
         function GetUsers() {
             $.ajax({
                 url: "/api/users",
@@ -72,7 +72,8 @@
                  }
             });
         }
-        // usanoxy yst id-i
+        // Select Styudnts by ID
+    
         function GetUser(id) {
             $.ajax({
                 url: "/api/users/"+id,
@@ -89,7 +90,7 @@
                 }
             });
         }
-        // avelacnum enq usanox
+        // add new student
         function CreateUser(userName, userAge, userProf, userGraphik, userAddress) {
             $.ajax({
                 url: "api/users",
@@ -108,7 +109,7 @@
                 }
             })
         }
-        // poxumenq usanoxin
+        // edit sudent date
         function EditUser(userId, userName, userAge, userProf, userAddress, userGraphik) {
             $.ajax({
                 url: "api/users",
@@ -130,14 +131,14 @@
             })
         }
 
-        //jnjum
+        //delete
         function reset() {
             var form = document.forms["userForm"];
             form.reset();
             form.elements["id"].value = 0;
         }
 
-        // jnjum enq usanoxin
+        // delete student by id
         function DeleteUser(id) {
             $.ajax({
                 url: "api/users/"+id,
@@ -149,21 +150,21 @@
                 }
             })
         }
-        // bzbzum enq
+        // student list 
         var row = function (user) {
             return "<tr data-rowid='" + user._id + "'><td>" + user._id + "</td>" +
                    "<td>" + user.name + "</td> <td>" + user.age + "</td> <td>" + user.prof + "</td> <td>" + user.address + "</td> <td>" + user.graphik + "</td>"  +
                    "<td><a class='editLink' data-id='" + user._id + "'>EDIT</a> | " +
                     "<a class='removeLink' data-id='" + user._id + "'>DELETE</a></td></tr>";
         }
-        // elienq bzbum
+        // click function
         $("#reset").click(function (e) {
 
             e.preventDefault();
             reset();
         })
 
-        // uxarkum enq tvyalnery
+        // send date 
         $("form").submit(function (e) {
             e.preventDefault();
             var id = this.elements["id"].value;
@@ -178,18 +179,18 @@
                 EditUser(id, name, age, prof, address, graphik);
         });
 
-        // poxelu hmar
+        // click function for edit
         $("body").on("click", ".editLink", function () {
             var id = $(this).data("id");
             GetUser(id);
         })
-        // jnjelu hmar
+        // click function for delete
         $("body").on("click", ".removeLink", function () {
             var id = $(this).data("id");
             DeleteUser(id);
         })
 
-        // datrkelu hamar
+        // get student list
         GetUsers();
     </script>
 </body>
